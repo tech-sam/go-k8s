@@ -24,6 +24,7 @@ SALES_APP       := sales
 AUTH_APP        := auth
 BASE_IMAGE_NAME := localhost/ardanlabs
 VERSION         := 0.0.1
+SERVICE_IMAGE   := sales-api
 SALES_IMAGE     := $(BASE_IMAGE_NAME)/$(SALES_APP):$(VERSION)
 METRICS_IMAGE   := $(BASE_IMAGE_NAME)/metrics:$(VERSION)
 AUTH_IMAGE      := $(BASE_IMAGE_NAME)/$(AUTH_APP):$(VERSION)
@@ -76,6 +77,21 @@ dev-status:
 	kubectl get pods -o wide --watch --all-namespaces
 
 # ==============================================================================
+
+# ==============================================================================
+# Building containers
+
+# Example: $(shell git rev-parse --short HEAD)
+VERSION := 1.0
+
+all: sales
+
+sales:
+	docker build \
+		-f zarf/docker/dockerfile.sales-api \
+		-t $(SERVICE_IMAGE) \
+		--build-arg BUILD_REF=$(VERSION) \
+		--build-arg BUILD_DATE=`date -u +"%Y-%m-%dT%H:%M:%SZ"` \
 
 run-local:
 	go run app/services/sales-api/main.go
