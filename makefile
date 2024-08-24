@@ -68,6 +68,12 @@ dev-down-local:
 dev-down:
 	kind delete cluster --name $(KIND_CLUSTER)
 
+dev-load:
+	kind load docker-image $(SERVICE_IMAGE) --name $(KIND_CLUSTER) 
+
+dev-apply:
+	kustomize build zarf/k8s/dev/sales | kubectl apply -f -
+	kubectl wait --namespace=$(NAMESPACE) --selector app=$(APP) --for=condition=Ready
 # ==============================================================================
 
 
@@ -88,10 +94,11 @@ all: sales
 
 sales:
 	docker build \
-		-f zarf/docker/dockerfile.sales-api \
+		-f zarf/docker/dockerfile.service \
 		-t $(SERVICE_IMAGE) \
 		--build-arg BUILD_REF=$(VERSION) \
 		--build-arg BUILD_DATE=`date -u +"%Y-%m-%dT%H:%M:%SZ"` \
+		.
 
 run-local:
 	go run app/services/sales-api/main.go

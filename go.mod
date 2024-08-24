@@ -1,6 +1,6 @@
 module github.com/tech-sam/go-k8s
 
-go 1.22.2
+go 1.20
 
 require go.uber.org/zap v1.27.0
 
