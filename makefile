@@ -21,13 +21,10 @@ KIND            := kindest/node:v1.31.0
 KIND_CLUSTER    := tech-sam-starter-cluster
 NAMESPACE       := sales-system
 SALES_APP       := sales
-AUTH_APP        := auth
-BASE_IMAGE_NAME := localhost/ardanlabs
+BASE_IMAGE_NAME := ardanlabs/service
+SERVICE_NAME	:= sales-api
 VERSION         := 0.0.1
-SERVICE_IMAGE   := sales-api
-SALES_IMAGE     := $(BASE_IMAGE_NAME)/$(SALES_APP):$(VERSION)
-METRICS_IMAGE   := $(BASE_IMAGE_NAME)/metrics:$(VERSION)
-AUTH_IMAGE      := $(BASE_IMAGE_NAME)/$(AUTH_APP):$(VERSION)
+SERVICE_IMAGE   := $(BASE_IMAGE_NAME)/$(SERVICE_NAME):$(VERSION)
 
 
 
@@ -73,7 +70,9 @@ dev-load:
 
 dev-apply:
 	kustomize build zarf/k8s/dev/sales | kubectl apply -f -
-	kubectl wait --namespace=$(NAMESPACE) --selector app=$(APP) --for=condition=Ready
+	kubectl wait pods --namespace=$(NAMESPACE) --selector app=$(SALES_APP) --for=condition=Ready
+
+	
 # ==============================================================================
 
 
@@ -82,7 +81,19 @@ dev-status:
 	kubectl get svc -o wide
 	kubectl get pods -o wide --watch --all-namespaces
 
+dev-restart:
+	kubectl rollout restart deployment $(SALES_APP) --namespace=$(NAMESPACE)
+
+dev-update: all dev-load dev-restart
+
+dev-update-apply: all dev-load dev-apply		
+
 # ==============================================================================
+
+dev-logs:
+	kubectl logs --namespace=$(NAMESPACE) -l app=$(SALES_APP) --all-containers=true -f --tail=100
+
+
 
 # ==============================================================================
 # Building containers

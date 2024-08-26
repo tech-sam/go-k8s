@@ -27,4 +27,4 @@ spec:
 
       containers:
       - name: sales-api
-        image: sales-api-image # its a place holder for doecker image name 
+        image: sales-api-image
