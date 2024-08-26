@@ -5,6 +5,6 @@ resources:
 patches:
 - path: ./dev-sales-patch-deploy.yaml
 images:
-- name: service-image
-  newName: sales-api
+- name: sales-api-image
+  newName: ardanlabs/service/sales-api
   newTag: 0.0.1  
