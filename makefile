@@ -9,7 +9,7 @@ SHELL = $(if $(wildcard $(SHELL_PATH)),/bin/ash,/bin/bash)
 
 
 # ==============================================================================
-# Install dependencies
+# Define dependencies
 
 
 GOLANG          := golang:1.23
@@ -26,7 +26,11 @@ SERVICE_NAME	:= sales-api
 VERSION         := 0.0.1
 SERVICE_IMAGE   := $(BASE_IMAGE_NAME)/$(SERVICE_NAME):$(VERSION)
 
+# ==============================================================================
+# Install dependencies
 
+dev-gotooling:
+	go install github.com/divan/expvarmon@latest
 
 dev-brew:
 	brew update
@@ -124,3 +128,9 @@ run-local-help:
 tidy:
 	go mod tidy
 	go mod vendor
+
+# ==============================================================================
+# Metrics and Tracing
+
+metrics-view-local:
+	expvarmon -ports="localhost:4000" -vars="build,requests,goroutines,errors,panics,mem:memstats.Alloc"
