@@ -15,6 +15,7 @@ SHELL = $(if $(wildcard $(SHELL_PATH)),/bin/ash,/bin/bash)
 GOLANG          := golang:1.23
 ALPINE          := alpine:3.20
 KIND            := kindest/node:v1.31.0
+TELEPRESENCE    := datawire/tel2:2.13.2
 
 
 
@@ -45,12 +46,18 @@ dev-docker:
 	docker pull $(GOLANG) & \
 	docker pull $(ALPINE) & \
 	docker pull $(KIND) & \
+	docker pull $(TELEPRESENCE) & \
 	wait;
 
 
 
 # ==============================================================================
 # Running from within k8s/kind
+
+dev-sam:
+	kind load docker-image $(TELEPRESENCE) --name $(KIND_CLUSTER)
+	telepresence --context=kind-$(KIND_CLUSTER) helm install
+	telepresence --context=kind-$(KIND_CLUSTER) connect
 
 
 dev-up-local:
@@ -60,13 +67,18 @@ dev-up-local:
 		--config zarf/k8s/dev/kind-config.yaml
 	
 	kubectl wait --timeout=120s --namespace=local-path-storage --for=condition=Available deployment/local-path-provisioner
+
+	kind load docker-image $(TELEPRESENCE) --name $(KIND_CLUSTER)
 	
 dev-up: dev-up-local
+	telepresence --context=kind-$(KIND_CLUSTER) helm install
+	telepresence --context=kind-$(KIND_CLUSTER) connect
 
 dev-down-local:
 	kind delete cluster --name $(KIND_CLUSTER)
 
 dev-down:
+	telepresence quit -s
 	kind delete cluster --name $(KIND_CLUSTER)
 
 dev-load:
