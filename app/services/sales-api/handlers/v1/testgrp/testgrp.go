@@ -2,8 +2,9 @@ package testgrp
 
 import (
 	"context"
-	"encoding/json"
 	"net/http"
+
+	"github.com/tech-sam/go-k8s/foundation/web"
 )
 
 func Test(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
@@ -12,5 +13,5 @@ func Test(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
 	}{
 		Status: "OK",
 	}
-	return json.NewEncoder(w).Encode(status)
+	return web.Respond(ctx, w, status, http.StatusOK)
 }
