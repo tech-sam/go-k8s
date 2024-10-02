@@ -8,3 +8,6 @@ func mainTest() {
 func testMain() {
 	fmt.Print("this is from main branch PR")
 }
+func test2() {
+	fmt.Print("this is from feature branch PR")
+}
